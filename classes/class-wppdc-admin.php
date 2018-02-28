@@ -80,10 +80,20 @@ class WP_Personal_Data_Controller_Admin {
 				die( 'Error: Invalid nonce' );
 			}
 
-			$context = sprintf(
-				__( 'The following personal data was found for %s:', 'wppdc' ),
-				$email
-			);
+			$user = get_user_by( 'email', $email );
+			$user_id = $user ? intval( $user->ID ) : false;
+
+			if ( $user_id ) {
+				$context = sprintf(
+					__( 'The following personal data was found for %s (user ID: %d):', 'wppdc' ),
+					$email, $user_id
+				);
+			} else {
+				$context = sprintf(
+					__( 'The following personal data was found for %s (not a registered user):', 'wppdc' ),
+					$email
+				);
+			}
 
 			?>
 				<p>
@@ -91,6 +101,7 @@ class WP_Personal_Data_Controller_Admin {
 				</p>
 			<?php
 
+			// TODO - handle converting this PHP array into a better format like XML or something
 			$personal_data = WP_Personal_Data_Controller::getInstance()->get_personal_data( $email );
 
 			?>
